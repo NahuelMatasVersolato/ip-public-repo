@@ -1,7 +1,9 @@
-{% extends 'header.html' %} {% block content %}
+{% extends 'header.html' %}
+
+{% block content %}
 <main>
     <h1 class="text-center">Galería de Imágenes de la NASA</h1>
-    <div class="d-flex justify-content-center" style="margin-bottom: 1%">
+    <div class="d-flex justify-content-center mb-3">
         <!-- Buscador del sitio -->
         <form class="d-flex" action="{% url 'buscar' %}" method="POST">
             {% csrf_token %}
@@ -10,15 +12,14 @@
         </form>
     </div>
 
-
     <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for imagen in images %}
         <div class="col">
             <div class="card">
-                <img src="{{ imagen.image_url}}" class="card-img-top" alt="imagen">
+                <img src="{{ imagen.image_url }}" class="card-img-top" alt="imagen">
                 <div class="card-body">
-                    <h5 class="card-title">{{ imagen.title}}</h5>
-                    <p class="card-text">{{ imagen.description}}</p>
+                    <h5 class="card-title">{{ imagen.title }}</h5>
+                    <p class="card-text">{{ imagen.description }}</p>
                 </div>
                 {% if request.user.is_authenticated %}
                 <div class="card-footer text-center">
@@ -27,10 +28,12 @@
                         <input type="hidden" name="title" value="{{ imagen.title }}">
                         <input type="hidden" name="description" value="{{ imagen.description }}">
                         <input type="hidden" name="image_url" value="{{ imagen.image_url }}">
-                        <input type="hidden" name="date" value="{{ imagen.date }}"> {% if imagen in favourite_list %}
-                        <button type="submit" class="btn btn-primary btn-sm float-left" style="color:white" disabled>✔️ Ya está añadida a favoritos</button> {% else %}
-                        <button type="submit" class="btn btn-primary btn-sm float-left" style="color:white">❤️ Añadir a favoritos</button> {% endif %}
-
+                        <input type="hidden" name="date" value="{{ imagen.date }}">
+                        {% if imagen in favourite_list %}
+                        <button type="submit" class="btn btn-primary btn-sm float-left" style="pointer-events: none;">✔️ Ya está añadida a favoritos</button>
+                        {% else %}
+                        <button type="submit" class="btn btn-primary btn-sm float-left">❤️ Añadir a favoritos</button>
+                        {% endif %}
                     </form>
                 </div>
                 {% endif %}
@@ -38,5 +41,40 @@
         </div>
         {% endfor %}
     </div>
+
+    <!-- Paginación -->
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            {% if images.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">Primera</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ images.previous_page_number }}">Anterior</a>
+                </li>
+            {% endif %}
+
+            <li class="page-item disabled">
+                <a class="page-link" href="#">Página {{ images.number }} de {{ images.paginator.num_pages }}</a>
+            </li>
+
+            {% if images.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ images.next_page_number }}">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ images.paginator.num_pages }}">Última</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <!-- Mostrar lista de favoritos si es necesario -->
+    {% if favourite_list %}
+        <h2 class="mt-4">Mis Favoritos</h2>
+        {% for favourite in favourite_list %}
+            <!-- Mostrar cada favorito -->
+        {% endfor %}
+    {% endif %}
 </main>
 {% endblock %}

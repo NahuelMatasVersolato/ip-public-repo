@@ -1,21 +1,26 @@
 # capa de servicio/lógica de negocio
 
+import requests
 from ..transport import transport
 from ..dao import repositories
 from ..generic import mapper
 from django.contrib.auth import get_user
-
+   
 def getAllImages(input=None):
-    # obtiene un listado de imágenes desde transport.py y lo guarda en un json_collection.
-    # ¡OJO! el parámetro 'input' indica si se debe buscar por un valor introducido en el buscador.
-    json_collection = []
-
-    images = []
-
-    # recorre el listado de objetos JSON, lo transforma en una NASACard y lo agrega en el listado de images. Ayuda: ver mapper.py.
-
+    json_collection = transport.getAllImages(input)
+    images = [mapper.fromRequestIntoNASACard(item) for item in json_collection]
     return images
-
+    
+def map_to_nasacard(item):
+    print("Mapeando objeto JSON a NASACard")
+    # Esta función debe transformar un objeto JSON en un objeto NASACard
+    # Esto es solo un ejemplo, ajusta según tu modelo NASACard
+    return {
+        'title': item.get('title'),
+        'url': item.get('url'),
+        'explanation': item.get('explanation'),
+        'date': item.get('date')
+    }
 
 def getImagesBySearchInputLike(input):
     return getAllImages(input)
